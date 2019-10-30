@@ -30,3 +30,21 @@ Route::get('/pruebas/{nombre?}', function ($nombre=null) {
 
 Route::get('/animales', 'PruebasController@index');
 Route::get('/testOrm', 'PruebasController@testOrm');
+
+//RUTAS DE LA API
+
+/*METODOS HTTP COMUNES
+ * GET: CONSEGUIR DATOS O RECURSOS
+ * POST: GUARDAR DATOS O RECURSOS O HACER LOGICA DESDE UN FORMULARIO
+ * PUT: ACTUALZIAR RECURSOS O DATOS
+ * DELETE: ELIMINAR DATOS O RECURSOS
+ */
+
+//Rutas de prueba
+Route::get('/entrada/pruebas', 'PostController@pruebas');
+Route::get('/categoria/pruebas', 'CategoryController@pruebas');
+Route::get('/usuario/pruebas', 'UserController@pruebas');
+
+//Rutas del controllador de usuarios
+Route::post('/api/register', 'UserController@register');
+Route::post('/api/login', 'UserController@login');
