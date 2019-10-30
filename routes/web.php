@@ -48,3 +48,4 @@ Route::get('/usuario/pruebas', 'UserController@pruebas');
 //Rutas del controllador de usuarios
 Route::post('/api/register', 'UserController@register');
 Route::post('/api/login', 'UserController@login');
+Route::post('/api/user/update', 'UserController@update');

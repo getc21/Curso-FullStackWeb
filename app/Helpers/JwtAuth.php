@@ -17,17 +17,17 @@ class JwtAuth {
     public function signup($email, $password, $getToken = null) {
 
 
-        //Buscar si existe el usuario con sus credenciales
+//Buscar si existe el usuario con sus credenciales
         $user = User::where([
                     'email' => $email,
                     'password' => $password
                 ])->first();
-        //Comprobar si son correctas
+//Comprobar si son correctas
         $signup = false;
         if (is_object($user)) {
             $signup = true;
         }
-        //Generar el toquen con los datos del usuario
+//Generar el toquen con los datos del usuario
         if ($signup) {
 
             $token = array(
@@ -42,10 +42,10 @@ class JwtAuth {
             $jwt = JWT::encode($token, $this->key, 'HS256');
             $decoded = JWT::decode($jwt, $this->key, ['HS256']);
 
-            //Devolver los datos decodificados o el token en funcion de un parametro
+//Devolver los datos decodificados o el token en funcion de un parametro
             if (is_null($getToken)) {
                 $data = $jwt;
-            }else{
+            } else {
                 $data = $decoded;
             }
         } else {
@@ -55,6 +55,30 @@ class JwtAuth {
             );
         }
         return $data;
+    }
+
+    public function checkToken($jwt, $getIdentity = false) {
+        $auth = false;
+
+        try {
+            $jwt = str_replace('"', '', $jwt);
+            $decoded = JWT::decode($jwt, $this->key, ['HS256']);
+        } catch (\UnexpectedValueException $e) {
+            $auth = false;
+        } catch (\DomainException $e) {
+            $auth = false;
+        }
+
+        if (!empty($decoded) && is_object($decoded) && isset($decoded->sub)) {
+            $auth = true;
+        } else {
+            $auth = false;
+        }
+
+        if ($getIdentity) {
+            return $decoded;
+        }
+        return $auth;
     }
 
 }
