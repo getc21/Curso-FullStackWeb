@@ -25,7 +25,7 @@ class UserController extends Controller {
             $validate = \Validator::make($params_array, [
                         'name' => 'required|alpha',
                         'surname' => 'required|alpha',
-                        'email' => 'required|email|unique:users', 
+                        'email' => 'required|email|unique:users',
                         'password' => 'required'
             ]);
 
@@ -36,13 +36,12 @@ class UserController extends Controller {
                     'message' => 'el usuario no se ha creado',
                     'errors' => $validate->errors()
                 );
-            } else{
-                
+            } else {
+
                 //Validacion pasada correctamente
-                
                 //Cifrar la contraseña
                 $pwd = hash('sha256', $params->password);
-                
+
                 //Crear el usuario
                 $user = new User();
                 $user->name = $params_array['name'];
@@ -50,10 +49,10 @@ class UserController extends Controller {
                 $user->email = $params_array['email'];
                 $user->password = $pwd;
                 $user->role = 'ROLE_USER';
-                
+
                 //Guardar el usuario
                 $user->save();
-                        
+
                 $data = array(
                     'status' => 'success',
                     'code' => 200,
@@ -68,25 +67,48 @@ class UserController extends Controller {
                 'message' => 'Los datos enviados no son correctos'
             );
         }
-    
 
 
 
-            return response()->json($data, $data['code']);
-        }
-    
+
+        return response()->json($data, $data['code']);
+    }
 
     public function login(Request $request) {
-        
+
         $jwtAuth = new \JwtAuth();
-        
-        
-        $email = 'juan@juan.com';
-        $password = 'juan';
-        $pwd = hash('sha256', $password);
-        
-        //var_dump($pwd); die();
-        return response()->json($jwtAuth->signup($email, $pwd, true),200);
+
+        //Recibir datos por post
+        $json = $request->input('json', null);
+        $params = json_decode($json);
+        $params_array = json_decode($json, true);
+        //Validar esos datos
+        $validate = \Validator::make($params_array, [
+                    'email' => 'required|email',
+                    'password' => 'required'
+        ]);
+
+        if ($validate->fails()) {
+            $signup = array(
+                'status' => 'error',
+                'code' => 404,
+                'message' => 'El usuario no se ha podido identificar',
+                'errors' => $validate->errors()
+            );
+        } else {
+
+            //Cifrar la contraseña
+            $pwd = hash('sha256', $params->password);
+            
+            //Devolver token o datos
+            $signup = $jwtAuth->signup($params->email, $pwd);
+            
+            if (!empty($params->gettoken)) {
+                $signup = $jwtAuth->signup($params->email, $pwd, true);
+            }
+        }
+
+        return response()->json($signup, 200);
     }
 
 }
